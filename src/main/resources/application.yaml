@@ -1,0 +1,16 @@
+spring:
+  datasource:
+    platform: postgres
+    url: jdbc:postgresql://10.10.10.201:5434/crg_gis_service
+    username: fiz
+    password: 314
+
+crg:
+  datasource:
+    target:
+      url: jdbc:postgresql://10.10.10.201:5434/
+      username: fiz
+      password: 314
+
+server:
+  port: 5648
