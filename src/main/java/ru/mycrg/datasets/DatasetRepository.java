@@ -40,11 +40,12 @@ public class DatasetRepository {
             final MapSqlParameterSource source = new MapSqlParameterSource()
                     .addValue("title", dataset.getTitle())
                     .addValue("type", dataset.getType())
+                    .addValue("count", dataset.getItemsCount())
                     .addValue("resId", dataset.getResourceIdentifier());
 
             String sql = "INSERT INTO data.resource_description(" +
-                    "title, type, resource_identifier, created_at, last_modified) " +
-                    "VALUES (:title, :type, :resId, now(), now()) ON CONFLICT DO NOTHING";
+                    "title, type, resource_identifier, items_count, created_at, last_modified) " +
+                    "VALUES (:title, :type, :resId, :count, now(), now()) ON CONFLICT DO NOTHING";
 
              jdbcTemplate.update(sql, source);
         } catch (Exception e) {

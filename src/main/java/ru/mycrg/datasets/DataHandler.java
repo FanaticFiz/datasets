@@ -2,10 +2,10 @@ package ru.mycrg.datasets;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.env.Environment;
 import org.springframework.stereotype.Service;
 import ru.mycrg.datasets.dto.ResourceDescription;
+import ru.mycrg.datasets.entity.Layer;
 import ru.mycrg.datasets.entity.Project;
 import ru.mycrg.datasets.repository.LayerRepository;
 import ru.mycrg.datasets.repository.ProjectRepository;
@@ -48,17 +48,21 @@ public class DataHandler {
         log.info("  Handle project: {}", project.getInternalName());
 
         List<ResourceDescription> datasets = new ArrayList<>();
-        datasets.add(new ResourceDescription(project.getName(), "SCHEMA", project.getInternalName()));
+        final List<Layer> projectsLayers = layerRepository.findAllByProjectId(project.getId());
 
-        layerRepository.findAllByProjectId(project.getId())
-                       .forEach(layer -> {
-                           final ResourceDescription rdTable = new ResourceDescription(
-                                   layer.getTitle(),
-                                   "TABLE",
-                                   project.getInternalName() + ":" + layer.getInternalName());
+        datasets.add(new ResourceDescription(project.getName(), "SCHEMA", project.getInternalName(),
+                projectsLayers.size()));
 
-                           datasets.add(rdTable);
-                       });
+        projectsLayers
+                .forEach(layer -> {
+                    final ResourceDescription rdTable = new ResourceDescription(
+                            layer.getTitle(),
+                            "TABLE",
+                            project.getInternalName() + ":" + layer.getInternalName(),
+                            0);
+
+                    datasets.add(rdTable);
+                });
 
         log.info("    Layers: {}", datasets.size() - 1);
 

@@ -8,16 +8,18 @@ public class ResourceDescription {
     private String details;
     private String type;
     private String resourceIdentifier;
+    private Integer itemsCount;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime lastModified = LocalDateTime.now();
 
     public ResourceDescription() {
     }
 
-    public ResourceDescription(String title, String type, String resourceIdentifier) {
+    public ResourceDescription(String title, String type, String resourceIdentifier, int count) {
         this.title = title;
         this.type = type;
         this.resourceIdentifier = resourceIdentifier;
+        this.itemsCount = count;
     }
 
     public String getTitle() {
@@ -66,5 +68,13 @@ public class ResourceDescription {
 
     public void setLastModified(LocalDateTime lastModified) {
         this.lastModified = lastModified;
+    }
+
+    public Integer getItemsCount() {
+        return itemsCount;
+    }
+
+    public void setItemsCount(Integer itemsCount) {
+        this.itemsCount = itemsCount;
     }
 }
