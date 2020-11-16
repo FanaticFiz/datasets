@@ -38,6 +38,13 @@
             <artifactId>postgresql</artifactId>
             <scope>runtime</scope>
         </dependency>
+
+        <!-- CRG -->
+        <dependency>
+            <groupId>ru.mycrg</groupId>
+            <artifactId>geoserver-client</artifactId>
+            <version>1.2-SNAPSHOT</version>
+        </dependency>
     </dependencies>
 
     <build>

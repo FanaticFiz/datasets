@@ -1,16 +1,19 @@
 spring:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://localhost:5434/crg_gis_service
+    url: jdbc:postgresql://10.10.10.98:5434/crg_gis_service
     username: fiz
     password: 314
 
 crg:
-  datasource:
-    target:
-      url: jdbc:postgresql://localhost:5434/
-      username: fiz
-      password: 314
+  serverUrl: http://10.10.10.98
+  db:
+    port: 5434
+    username: fiz
+    password: 314
+  geoserver:
+    port: 8080
+    userServerName: postgres_db_user_service
 
 server:
   port: 5649

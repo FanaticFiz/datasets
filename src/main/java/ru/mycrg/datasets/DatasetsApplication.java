@@ -1,52 +1,64 @@
 package ru.mycrg.datasets;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.ConfigurableApplicationContext;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
-import ru.mycrg.datasets.entity.Project;
-import ru.mycrg.datasets.repository.ProjectRepository;
+import ru.mycrg.geoserver_client.DbInfo;
+import ru.mycrg.geoserver_client.GeoserverClient;
+import ru.mycrg.geoserver_client.GeoserverInfo;
 
-import java.util.List;
-import java.util.stream.Collectors;
+import javax.transaction.Transactional;
 
 @SpringBootApplication
 public class DatasetsApplication {
 
-    public static final Logger log = LoggerFactory.getLogger(DatasetsApplication.class);
-
     @Autowired
-    private Environment environment;
+    ConfigurableApplicationContext ctx;
 
-    @Autowired
-    private ProjectRepository projectRepository;
+    private final Environment environment;
+    private final ProjectHandler projectHandler;
 
-    @Autowired
-    private DataHandler dataHandler;
+    public DatasetsApplication(Environment environment,
+                               ProjectHandler projectHandler) {
+        this.environment = environment;
+        this.projectHandler = projectHandler;
+    }
 
     public static void main(String[] args) {
         SpringApplication.run(DatasetsApplication.class, args);
     }
 
+    @Transactional
     @EventListener(ApplicationReadyEvent.class)
     public void appReady() {
-        final String initDb = environment.getRequiredProperty("spring.datasource.url");
-        final String targetDb = environment.getRequiredProperty("crg.datasource.target.url");
+        initGeoserverClient();
 
-        log.info("Copy from db: {} to: {}", initDb, targetDb);
+        projectHandler.handle(718);
 
-        final List<Long> allExistOrganizationIds = projectRepository
-                .findAll().stream()
-                .map(Project::getOrganizationId)
-                .distinct()
-                .filter(orgId -> orgId > 0)
-                .collect(Collectors.toList());
-        log.info("Found organizations: {}", allExistOrganizationIds);
+        System.exit(0);
+    }
 
-        allExistOrganizationIds.forEach(orgId -> dataHandler.handleDatabase(orgId));
+    private void initGeoserverClient() {
+        final String serverHost = environment.getRequiredProperty("crg.serverUrl");
+
+        GeoserverInfo geoserverInfo = GeoserverInfo
+                .builder()
+                .host(serverHost)
+                .port(Integer.parseInt(environment.getRequiredProperty("crg.geoserver.port")))
+                .userServiceName(environment.getRequiredProperty("crg.geoserver.userServerName"))
+                .build();
+
+        DbInfo dbInfo = DbInfo.builder()
+                              .dbHost(serverHost)
+                              .dbPort(Integer.parseInt(environment.getRequiredProperty("crg.db.port")))
+                              .dbOwnerUser(environment.getRequiredProperty("spring.datasource.username"))
+                              .dbOwnerPassword(environment.getRequiredProperty("spring.datasource.password"))
+                              .build();
+
+        GeoserverClient.initialize(geoserverInfo, dbInfo);
     }
 }
