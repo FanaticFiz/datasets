@@ -18,6 +18,9 @@ public class Layer {
     private String title;
 
     @Column
+    private String dataset;
+
+    @Column
     private String internalName;
 
     @Column
@@ -211,5 +214,13 @@ public class Layer {
 
     public void setType(String type) {
         this.type = type;
+    }
+
+    public String getDataset() {
+        return dataset;
+    }
+
+    public void setDataset(String dataset) {
+        this.dataset = dataset;
     }
 }

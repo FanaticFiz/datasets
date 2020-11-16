@@ -6,7 +6,7 @@ spring:
     password: 314
 
 crg:
-  serverUrl: http://10.10.10.98
+  serverHost: 10.10.10.98
   db:
     port: 5434
     username: fiz
