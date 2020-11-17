@@ -1,6 +1,8 @@
 package ru.mycrg.datasets;
 
 import okhttp3.OkHttpClient;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.boot.SpringApplication;
 import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -16,6 +18,8 @@ import javax.transaction.Transactional;
 
 @SpringBootApplication
 public class DatasetsApplication {
+
+    public static final Logger log = LoggerFactory.getLogger(DatasetsApplication.class);
 
     public static final String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
             ".eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDU2MTc5NTYsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiJiNWRiMjIwOC04MDQyLTRjMmYtOWFlZS0zOGY1N2Y5ZDdiOTkiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.hSM7y56sJRsem2RqQnCGDlY12Dxp1-FEkkrvKQPM8hA";
@@ -35,12 +39,12 @@ public class DatasetsApplication {
 
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
-    public void appReady() {
+    public void appReady() throws InterruptedException {
         initGeoserverClient();
 
         projectHandler.handle(1, 718);
 
-        System.exit(0);
+        log.info("DONE HANDLE PROJECT: {}", 718);
     }
 
     private void initGeoserverClient() {

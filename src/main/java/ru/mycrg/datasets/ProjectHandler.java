@@ -30,7 +30,7 @@ public class ProjectHandler {
         this.vectorLayerHandler = vectorLayerHandler;
     }
 
-    public void handle(int orgId, int projectId) {
+    public void handle(int orgId, int projectId) throws InterruptedException {
         final Project foundProject = projectRepository
                 .findAll().stream()
                 .filter(project -> projectId == project.getId())

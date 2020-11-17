@@ -4,6 +4,10 @@ spring:
     url: jdbc:postgresql://10.10.10.98:5434/crg_gis_service
     username: fiz
     password: 314
+  jpa:
+    show-sql: false
+    properties:
+      hibernate.format_sql: true
 
 crg:
   serverHost: 10.10.10.98
