@@ -33,10 +33,10 @@ public class ProjectHandler {
         this.rasterLayerHandler = rasterLayerHandler;
     }
 
-    public void handle(int orgId, int projectId) {
+    public void handle(int orgId, Long projectId) {
         final Project foundProject = projectRepository
                 .findAll().stream()
-                .filter(project -> projectId == project.getId())
+                .filter(project -> projectId.equals(project.getId()))
                 .findFirst()
                 .orElseThrow(() -> new EntityNotFoundException("Not fount project by id: " + projectId));
 
@@ -56,7 +56,7 @@ public class ProjectHandler {
         rasterLayerHandler.handle(rasterLayers, orgId, projectId);
     }
 
-    private String createVectorStorage(int orgId, int projectId) {
+    private String createVectorStorage(int orgId, Long projectId) {
         VectorStorage vectorStorage = new VectorStorage(ACCESS_KEY);
         try {
             final String databaseName = "database_" + orgId;

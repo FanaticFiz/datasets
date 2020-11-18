@@ -8,14 +8,16 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.core.env.Environment;
+import ru.mycrg.datasets.entity.Project;
+import ru.mycrg.datasets.repository.ProjectRepository;
 import ru.mycrg.geoserver_client.DbInfo;
 import ru.mycrg.geoserver_client.GeoserverClient;
 import ru.mycrg.geoserver_client.GeoserverInfo;
 import ru.mycrg.http_client.HttpClient;
-import ru.mycrg.http_client.exceptions.HttpClientException;
 import ru.mycrg.http_client.handlers.BaseRequestHandler;
 
 import javax.transaction.Transactional;
+import java.util.List;
 
 @SpringBootApplication
 public class DatasetsApplication {
@@ -26,11 +28,14 @@ public class DatasetsApplication {
 
     private final Environment environment;
     private final ProjectHandler projectHandler;
+    private final ProjectRepository projectRepository;
 
     public DatasetsApplication(Environment environment,
+                               ProjectRepository projectRepository,
                                ProjectHandler projectHandler) {
         this.environment = environment;
         this.projectHandler = projectHandler;
+        this.projectRepository = projectRepository;
     }
 
     public static void main(String[] args) {
@@ -42,10 +47,18 @@ public class DatasetsApplication {
     public void appReady() {
         initGeoserverClient();
 
-        projectHandler.handle(1, 718);
+        final int orgId = 1;
 
-        log.info("********************");
-        log.info("DONE HANDLE PROJECT: {}", 718);
+        final List<Project> projects = projectRepository.findAll();
+        projects.forEach(project -> {
+            final Long projectId = project.getId();
+            log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
+
+            projectHandler.handle(orgId, projectId);
+
+            log.info("****************************************************************************************************");
+            log.info("DONE HANDLE PROJECT: {}", projectId);
+        });
     }
 
     private void initGeoserverClient() {
