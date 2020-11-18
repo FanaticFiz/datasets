@@ -12,6 +12,7 @@ import ru.mycrg.geoserver_client.DbInfo;
 import ru.mycrg.geoserver_client.GeoserverClient;
 import ru.mycrg.geoserver_client.GeoserverInfo;
 import ru.mycrg.http_client.HttpClient;
+import ru.mycrg.http_client.exceptions.HttpClientException;
 import ru.mycrg.http_client.handlers.BaseRequestHandler;
 
 import javax.transaction.Transactional;
@@ -21,8 +22,7 @@ public class DatasetsApplication {
 
     public static final Logger log = LoggerFactory.getLogger(DatasetsApplication.class);
 
-    public static final String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9" +
-            ".eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDU2MTc5NTYsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiJiNWRiMjIwOC04MDQyLTRjMmYtOWFlZS0zOGY1N2Y5ZDdiOTkiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.hSM7y56sJRsem2RqQnCGDlY12Dxp1-FEkkrvKQPM8hA";
+    public static final String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDU3NzY4NzUsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiI5NmJkY2U0OC05YzJjLTQwNjktOTJhOS0xZmI1MDUzNGU5MzMiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.R32DhgYcqqigm_iQhGJa_HU6wEzHgogAzlg3vtTsilA";
 
     private final Environment environment;
     private final ProjectHandler projectHandler;
@@ -39,11 +39,12 @@ public class DatasetsApplication {
 
     @Transactional
     @EventListener(ApplicationReadyEvent.class)
-    public void appReady() throws InterruptedException {
+    public void appReady() {
         initGeoserverClient();
 
         projectHandler.handle(1, 718);
 
+        log.info("********************");
         log.info("DONE HANDLE PROJECT: {}", 718);
     }
 

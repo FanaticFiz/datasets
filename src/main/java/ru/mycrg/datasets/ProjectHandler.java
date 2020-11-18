@@ -6,7 +6,7 @@ import org.springframework.stereotype.Service;
 import ru.mycrg.datasets.entity.Layer;
 import ru.mycrg.datasets.entity.Project;
 import ru.mycrg.datasets.repository.ProjectRepository;
-import ru.mycrg.geoserver_client.services.storage.StorageService;
+import ru.mycrg.geoserver_client.services.storage.vector.VectorStorage;
 import ru.mycrg.http_client.exceptions.HttpClientException;
 
 import javax.persistence.EntityNotFoundException;
@@ -21,16 +21,19 @@ public class ProjectHandler {
 
     public static final Logger log = LoggerFactory.getLogger(ProjectHandler.class);
 
+    private final RasterLayerHandler rasterLayerHandler;
     private final VectorLayerHandler vectorLayerHandler;
     private final ProjectRepository projectRepository;
 
     public ProjectHandler(ProjectRepository projectRepository,
+                          RasterLayerHandler rasterLayerHandler,
                           VectorLayerHandler vectorLayerHandler) {
         this.projectRepository = projectRepository;
         this.vectorLayerHandler = vectorLayerHandler;
+        this.rasterLayerHandler = rasterLayerHandler;
     }
 
-    public void handle(int orgId, int projectId) throws InterruptedException {
+    public void handle(int orgId, int projectId) {
         final Project foundProject = projectRepository
                 .findAll().stream()
                 .filter(project -> projectId == project.getId())
@@ -39,7 +42,7 @@ public class ProjectHandler {
 
         log.info("Handle project: {} / {}", foundProject.getInternalName(), projectId);
 
-        final String storageName = createStorage(orgId, projectId);
+        final String storageName = createVectorStorage(orgId, projectId);
 
         final List<Layer> vectorLayers = foundProject.getLayers().stream()
                                                      .filter(layer -> layer.getType().equals("vector"))
@@ -50,10 +53,11 @@ public class ProjectHandler {
                                                      .collect(Collectors.toList());
 
         vectorLayerHandler.handle(vectorLayers, orgId, projectId, storageName);
+        rasterLayerHandler.handle(rasterLayers, orgId, projectId);
     }
 
-    private String createStorage(int orgId, int projectId) {
-        StorageService storageService = new StorageService(ACCESS_KEY);
+    private String createVectorStorage(int orgId, int projectId) {
+        VectorStorage vectorStorage = new VectorStorage(ACCESS_KEY);
         try {
             final String databaseName = "database_" + orgId;
             final String schemaName = "workspace_" + projectId;
@@ -62,7 +66,7 @@ public class ProjectHandler {
 
             log.info("create storage: {} in {}", datasetName, workspaceName);
 
-            storageService.createStorage(databaseName, schemaName, workspaceName, datasetName);
+            vectorStorage.create(databaseName, schemaName, workspaceName, datasetName);
 
             return datasetName;
         } catch (HttpClientException e) {
