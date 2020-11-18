@@ -18,6 +18,7 @@ import ru.mycrg.http_client.handlers.BaseRequestHandler;
 
 import javax.transaction.Transactional;
 import java.util.List;
+import java.util.concurrent.atomic.AtomicInteger;
 
 @SpringBootApplication
 public class DatasetsApplication {
@@ -50,14 +51,21 @@ public class DatasetsApplication {
         final int orgId = 1;
 
         final List<Project> projects = projectRepository.findAll();
+        log.info("START HANDLE ORGANIZATION: {}", orgId);
+        AtomicInteger projectCount = new AtomicInteger(projects.size());
+        log.info("There are {} projects", projectCount);
+
         projects.forEach(project -> {
             final Long projectId = project.getId();
             log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
 
             projectHandler.handle(orgId, projectId);
 
-            log.info("****************************************************************************************************");
+            projectCount.getAndDecrement();
             log.info("DONE HANDLE PROJECT: {}", projectId);
+            log.info("****************************************************************************************************");
+            log.info("Left: {}", projectCount);
+            log.info("****************************************************************************************************");
         });
     }
 
