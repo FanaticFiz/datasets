@@ -7,7 +7,8 @@ public class ResourceDescription {
     private String title;
     private String details;
     private String type;
-    private String resourceIdentifier;
+    private String owner;
+    private String identifier;
     private Integer itemsCount;
     private LocalDateTime createdAt = LocalDateTime.now();
     private LocalDateTime lastModified = LocalDateTime.now();
@@ -15,11 +16,12 @@ public class ResourceDescription {
     public ResourceDescription() {
     }
 
-    public ResourceDescription(String title, String type, String resourceIdentifier, int count) {
+    public ResourceDescription(String title, String type, String identifier, int count) {
         this.title = title;
         this.type = type;
-        this.resourceIdentifier = resourceIdentifier;
+        this.identifier = identifier;
         this.itemsCount = count;
+        this.owner = "arh_grad_rk@mail.ru";
     }
 
     public String getTitle() {
@@ -46,12 +48,12 @@ public class ResourceDescription {
         this.type = type;
     }
 
-    public String getResourceIdentifier() {
-        return resourceIdentifier;
+    public String getIdentifier() {
+        return identifier;
     }
 
-    public void setResourceIdentifier(String resourceIdentifier) {
-        this.resourceIdentifier = resourceIdentifier;
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 
     public LocalDateTime getCreatedAt() {
@@ -76,5 +78,13 @@ public class ResourceDescription {
 
     public void setItemsCount(Integer itemsCount) {
         this.itemsCount = itemsCount;
+    }
+
+    public String getOwner() {
+        return owner;
+    }
+
+    public void setOwner(String owner) {
+        this.owner = owner;
     }
 }

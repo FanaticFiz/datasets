@@ -48,21 +48,19 @@ public class DataHandler {
         log.info("  Handle project: {}", project.getInternalName());
 
         List<ResourceDescription> datasets = new ArrayList<>();
-        final List<Layer> projectsLayers = layerRepository.findAllByProjectId(project.getId());
+        final List<Layer> layers = layerRepository.findAllByProjectId(project.getId());
 
-        datasets.add(new ResourceDescription(project.getName(), "SCHEMA", project.getInternalName(),
-                projectsLayers.size()));
+        datasets.add(new ResourceDescription(project.getName(), "SCHEMA", project.getInternalName(), layers.size()));
 
-        projectsLayers
-                .forEach(layer -> {
-                    final ResourceDescription rdTable = new ResourceDescription(
-                            layer.getTitle(),
-                            "TABLE",
-                            project.getInternalName() + ":" + layer.getInternalName(),
-                            0);
+        layers.forEach(layer -> {
+            final ResourceDescription rdTable = new ResourceDescription(
+                    layer.getTitle(),
+                    "TABLE",
+                    project.getInternalName() + ":" + layer.getInternalName(),
+                    0);
 
-                    datasets.add(rdTable);
-                });
+            datasets.add(rdTable);
+        });
 
         log.info("    Layers: {}", datasets.size() - 1);
 

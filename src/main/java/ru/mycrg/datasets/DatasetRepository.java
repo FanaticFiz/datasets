@@ -41,15 +41,16 @@ public class DatasetRepository {
                     .addValue("title", dataset.getTitle())
                     .addValue("type", dataset.getType())
                     .addValue("count", dataset.getItemsCount())
-                    .addValue("resId", dataset.getResourceIdentifier());
+                    .addValue("resId", dataset.getIdentifier())
+                    .addValue("owner", dataset.getOwner());
 
             String sql = "INSERT INTO data.resource_description(" +
-                    "title, type, resource_identifier, items_count, created_at, last_modified) " +
-                    "VALUES (:title, :type, :resId, :count, now(), now()) ON CONFLICT DO NOTHING";
+                    "title, type, identifier, items_count, owner, created_at, last_modified) " +
+                    "VALUES (:title, :type, :resId, :count, :owner, now(), now()) ON CONFLICT DO NOTHING";
 
              jdbcTemplate.update(sql, source);
         } catch (Exception e) {
-            log.error("Failed insert row: {}. Reason: {}", dataset.getResourceIdentifier(), e.getMessage());
+            log.error("Failed insert row: {}. Reason: {}", dataset.getIdentifier(), e.getMessage());
         }
     }
 
