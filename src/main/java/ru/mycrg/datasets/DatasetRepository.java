@@ -48,7 +48,7 @@ public class DatasetRepository {
                     "title, type, identifier, items_count, owner, created_at, last_modified) " +
                     "VALUES (:title, :type, :resId, :count, :owner, now(), now()) ON CONFLICT DO NOTHING";
 
-             jdbcTemplate.update(sql, source);
+            jdbcTemplate.update(sql, source);
         } catch (Exception e) {
             log.error("Failed insert row: {}. Reason: {}", dataset.getIdentifier(), e.getMessage());
         }

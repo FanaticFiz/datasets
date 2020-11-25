@@ -56,7 +56,7 @@ public class DataHandler {
             final ResourceDescription rdTable = new ResourceDescription(
                     layer.getTitle(),
                     "TABLE",
-                    project.getInternalName() + ":" + layer.getInternalName(),
+                    project.getInternalName() + "." + layer.getInternalName(),
                     0);
 
             datasets.add(rdTable);
