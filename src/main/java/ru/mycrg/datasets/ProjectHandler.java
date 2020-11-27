@@ -42,17 +42,16 @@ public class ProjectHandler {
 
         log.info("Handle project: {} / {}", foundProject.getInternalName(), projectId);
 
-        final String storageName = createVectorStorage(orgId, projectId);
+//        final List<Layer> vectorLayers = foundProject.getLayers().stream()
+//                                                     .filter(layer -> layer.getType().equals("vector"))
+//                                                     .collect(Collectors.toList());
+//        final String storageName = createVectorStorage(orgId, projectId);
+//        vectorLayerHandler.handle(vectorLayers, orgId, projectId, storageName);
 
-        final List<Layer> vectorLayers = foundProject.getLayers().stream()
-                                                     .filter(layer -> layer.getType().equals("vector"))
-                                                     .collect(Collectors.toList());
 
         final List<Layer> rasterLayers = foundProject.getLayers().stream()
                                                      .filter(layer -> layer.getType().equals("raster"))
                                                      .collect(Collectors.toList());
-
-        vectorLayerHandler.handle(vectorLayers, orgId, projectId, storageName);
         rasterLayerHandler.handle(rasterLayers, orgId, projectId);
     }
 

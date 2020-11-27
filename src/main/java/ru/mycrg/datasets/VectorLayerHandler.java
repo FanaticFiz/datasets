@@ -37,61 +37,65 @@ public class VectorLayerHandler {
         StyleService styleService = new StyleService(ACCESS_KEY);
 
         layers.forEach(layer -> {
-            if (isLayerAlreadyHandled(layer.getInternalName(), projectId)) {
-                log.info("SKIP LAYER: {}/{}", layer.getInternalName(), layer.getTitle());
-            } else {
-                log.info("Handle layer: {}/{}", layer.getInternalName(), layer.getTitle());
+            if (layer.getInternalName().equals("border")) {
 
-                final String oldWorkspaceName = "workspace_" + projectId;
-                final String newWorkspaceName = "scratch_database_" + orgId;
-                final String currentLayerName = layer.getInternalName();
-                final String featureName = String.format("%s_%d_%s", currentLayerName, projectId,
-                                                         UUID.randomUUID().toString().substring(0, 4));
-                final int srs = extractCRSNumber(layer.getNativeCRS());
+                if (isLayerAlreadyHandled(layer.getInternalName(), projectId)) {
+                    log.info("SKIP LAYER: {}/{}", layer.getInternalName(), layer.getTitle());
+                } else {
+                    log.info("Handle layer: {}/{}", layer.getInternalName(), layer.getTitle());
 
-                // 1. rename exist table to new_name
-                try {
-                    log.info("1. try rename tables in DB");
-                    final JdbcTemplate jdbcTemplate = dataSourceFactory.getJdbcTemplate("database_" + orgId);
+                    final String oldWorkspaceName = "workspace_" + projectId;
+                    final String newWorkspaceName = "scratch_database_" + orgId;
+                    final String currentLayerName = layer.getInternalName();
+                    final String featureName = String.format("%s_%d_%s", currentLayerName, projectId,
+                                                             UUID.randomUUID().toString().substring(0, 4));
+                    final int srs = extractCRSNumber(layer.getNativeCRS());
 
-                    final String resourceId = oldWorkspaceName + "." + currentLayerName;
-                    jdbcTemplate.execute("ALTER TABLE " + resourceId + " RENAME TO " + featureName);
+                    // 1. rename exist table to new_name
+                    try {
+                        log.info("1. try rename tables in DB");
+                        final JdbcTemplate jdbcTemplate = dataSourceFactory.getJdbcTemplate("database_" + orgId);
 
-                    final String extId = resourceId + "_extension";
-                    jdbcTemplate.execute("ALTER TABLE " + extId + " RENAME TO " + featureName + "_extension");
-                } catch (Exception e) {
-                    log.error("Не удалось переименовать таблицу: {} в БД", currentLayerName);
+                        final String resourceId = oldWorkspaceName + "." + currentLayerName;
+                        jdbcTemplate.execute("ALTER TABLE " + resourceId + " RENAME TO " + featureName);
+
+                        final String extId = resourceId + "_extension";
+                        jdbcTemplate.execute("ALTER TABLE " + extId + " RENAME TO " + featureName + "_extension");
+                    } catch (Exception e) {
+                        log.error("Не удалось переименовать таблицу: {} в БД", currentLayerName);
+                    }
+
+                    // 2. create feature on geoserver
+                    try {
+                        log.info("2. try create feature on geoserver");
+                        featureTypeService.create(newWorkspaceName, storageName, featureName, srs);
+                    } catch (HttpClientException e) {
+                        log.error("Не удалось создать слой на геосервере: {}", e.getMessage());
+                    }
+
+                    // 3. join style
+                    try {
+                        log.info("3. try join style");
+                        styleService.associate(newWorkspaceName + ":" + featureName, layer.getStyleName());
+                    } catch (HttpClientException e) {
+                        log.error("Не удалось связать стиль со слоем на геосервере: {}", e.getMessage());
+                    }
+
+                    // 4. Обновить нашу обертку
+                    try {
+                        log.info("4. update our layer info");
+                        final String dataSourceUri = layer.getDataSourceUri();
+                        final String[] splited = dataSourceUri.split("tables/");
+                        String newDataSourceUri = splited[0] + "tables/" + featureName;
+
+                        layer.setInternalName(featureName);
+                        layer.setDataSourceUri(newDataSourceUri);
+                        layerRepository.save(layer);
+                    } catch (Exception e) {
+                        log.error("Не удалось сохранить новый слой: {}", e.getMessage(), e.getCause());
+                    }
                 }
 
-                // 2. create feature on geoserver
-                try {
-                    log.info("2. try create feature on geoserver");
-                    featureTypeService.create(newWorkspaceName, storageName, featureName, srs);
-                } catch (HttpClientException e) {
-                    log.error("Не удалось создать слой на геосервере: {}", e.getMessage());
-                }
-
-                // 3. join style
-                try {
-                    log.info("3. try join style");
-                    styleService.associate(newWorkspaceName + ":" + featureName, layer.getStyleName());
-                } catch (HttpClientException e) {
-                    log.error("Не удалось связать стиль со слоем на геосервере: {}", e.getMessage());
-                }
-
-                // 4. Обновить нашу обертку
-                try {
-                    log.info("4. update our layer info");
-                    final String dataSourceUri = layer.getDataSourceUri();
-                    final String[] splited = dataSourceUri.split("tables/");
-                    String newDataSourceUri = splited[0] + "tables/" + featureName;
-
-                    layer.setInternalName(featureName);
-                    layer.setDataSourceUri(newDataSourceUri);
-                    layerRepository.save(layer);
-                } catch (Exception e) {
-                    log.error("Не удалось сохранить новый слой: {}", e.getMessage(), e.getCause());
-                }
             }
         });
     }

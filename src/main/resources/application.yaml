@@ -1,7 +1,7 @@
 spring:
   datasource:
     platform: postgres
-    url: jdbc:postgresql://10.10.10.98:5434/crg_gis_service
+    url: jdbc:postgresql://10.10.10.172:5434/crg_gis_service
     username: fiz
     password: 314
   jpa:
@@ -10,7 +10,7 @@ spring:
       hibernate.format_sql: true
 
 crg:
-  serverHost: 10.10.10.98
+  serverHost: 10.10.10.172
   db:
     port: 5434
     username: fiz

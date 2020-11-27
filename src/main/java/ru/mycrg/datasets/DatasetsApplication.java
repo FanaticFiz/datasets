@@ -25,7 +25,7 @@ public class DatasetsApplication {
 
     public static final Logger log = LoggerFactory.getLogger(DatasetsApplication.class);
 
-    public static final String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDU3NzY4NzUsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiI5NmJkY2U0OC05YzJjLTQwNjktOTJhOS0xZmI1MDUzNGU5MzMiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.R32DhgYcqqigm_iQhGJa_HU6wEzHgogAzlg3vtTsilA";
+    public static final String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDY1ODQ1NzIsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiIxOTRlYjFjNi0xZDM0LTQxMmQtOGM0MS04MGZhNDUwMDI1NjgiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.ZvBMi4RIyJ_Ou5jUJuqVnYBlg2gwD8yzC_4aAqQRDp4";
 
     private final Environment environment;
     private final ProjectHandler projectHandler;
@@ -56,16 +56,18 @@ public class DatasetsApplication {
         log.info("There are {} projects", projectCount);
 
         projects.forEach(project -> {
-            final Long projectId = project.getId();
-            log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
+//            if (project.getId() == 457) {
+                final Long projectId = project.getId();
+                log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
 
-            projectHandler.handle(orgId, projectId);
+                projectHandler.handle(orgId, projectId);
 
-            projectCount.getAndDecrement();
-            log.info("DONE HANDLE PROJECT: {}", projectId);
-            log.info("****************************************************************************************************");
-            log.info("Left: {}", projectCount);
-            log.info("****************************************************************************************************");
+                projectCount.getAndDecrement();
+                log.info("DONE HANDLE PROJECT: {}", projectId);
+                log.info("****************************************************************************************************");
+                log.info("Left: {}", projectCount);
+//            }
+        log.info("****************************************************************************************************");
         });
     }
 
