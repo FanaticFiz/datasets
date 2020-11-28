@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ru.mycrg.datasets.DatasetsApplication.ACCESS_KEY;
+import static ru.mycrg.datasets.DatasetsApplication.ORG_OWNER_ACCESS_KEY;
 
 @Service
 public class ProjectHandler {
@@ -42,21 +42,24 @@ public class ProjectHandler {
 
         log.info("Handle project: {} / {}", foundProject.getInternalName(), projectId);
 
-//        final List<Layer> vectorLayers = foundProject.getLayers().stream()
-//                                                     .filter(layer -> layer.getType().equals("vector"))
-//                                                     .collect(Collectors.toList());
-//        final String storageName = createVectorStorage(orgId, projectId);
-//        vectorLayerHandler.handle(vectorLayers, orgId, projectId, storageName);
-
-
-        final List<Layer> rasterLayers = foundProject.getLayers().stream()
-                                                     .filter(layer -> layer.getType().equals("raster"))
+        final List<Layer> vectorLayers = foundProject.getLayers().stream()
+                                                     .filter(layer -> layer.getType().equals("vector"))
                                                      .collect(Collectors.toList());
-        rasterLayerHandler.handle(rasterLayers, orgId, projectId);
+        log.info("There are vectorLayers: {}", vectorLayers.size());
+
+        final String storageName = createVectorStorage(orgId, projectId);
+        vectorLayerHandler.handle(vectorLayers, orgId, projectId, storageName);
+
+
+//        final List<Layer> rasterLayers = foundProject.getLayers().stream()
+//                                                     .filter(layer -> layer.getType().equals("raster"))
+//                                                     .collect(Collectors.toList());
+//        log.info("There are rasterLayers: {}", rasterLayers.size());
+//        rasterLayerHandler.handle(rasterLayers, orgId, projectId);
     }
 
     private String createVectorStorage(int orgId, Long projectId) {
-        VectorStorage vectorStorage = new VectorStorage(ACCESS_KEY);
+        VectorStorage vectorStorage = new VectorStorage(ORG_OWNER_ACCESS_KEY);
         try {
             final String databaseName = "database_" + orgId;
             final String schemaName = "workspace_" + projectId;

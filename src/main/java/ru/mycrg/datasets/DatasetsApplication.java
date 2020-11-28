@@ -19,13 +19,16 @@ import ru.mycrg.http_client.handlers.BaseRequestHandler;
 import javax.transaction.Transactional;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicInteger;
+import java.util.stream.Collectors;
 
 @SpringBootApplication
 public class DatasetsApplication {
 
     public static final Logger log = LoggerFactory.getLogger(DatasetsApplication.class);
 
-    public static final String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDY1ODQ1NzIsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiIxOTRlYjFjNi0xZDM0LTQxMmQtOGM0MS04MGZhNDUwMDI1NjgiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.ZvBMi4RIyJ_Ou5jUJuqVnYBlg2gwD8yzC_4aAqQRDp4";
+    public static final String ORG_OWNER_ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDY2NDc2ODgsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiI5MjExNDE4Zi0xZDBmLTRiZTgtOTIyNC05ZTM2ZGQ0ODk4MTQiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.wHnQzeenExEiNr-EMvCYK8lSZB60SuC5wIeS4rLgIS8";
+
+    public static HttpClient httpClient;
 
     private final Environment environment;
     private final ProjectHandler projectHandler;
@@ -48,10 +51,13 @@ public class DatasetsApplication {
     public void appReady() {
         initGeoserverClient();
 
-        final int orgId = 1;
-
-        final List<Project> projects = projectRepository.findAll();
+        final int orgId = 8;
         log.info("START HANDLE ORGANIZATION: {}", orgId);
+
+        final List<Project> projects = projectRepository.findAll().stream()
+                .filter(project -> project.getOrganizationId() == orgId)
+                .collect(Collectors.toList());
+
         AtomicInteger projectCount = new AtomicInteger(projects.size());
         log.info("There are {} projects", projectCount);
 
@@ -88,7 +94,7 @@ public class DatasetsApplication {
                               .dbOwnerPassword(environment.getRequiredProperty("spring.datasource.password"))
                               .build();
 
-        final HttpClient httpClient = new HttpClient(new BaseRequestHandler(new OkHttpClient()));
+        httpClient = new HttpClient(new BaseRequestHandler(new OkHttpClient()));
         GeoserverClient.initialize(geoserverInfo, dbInfo, httpClient);
     }
 }
