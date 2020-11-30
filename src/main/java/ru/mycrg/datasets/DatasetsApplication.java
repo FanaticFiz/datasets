@@ -18,7 +18,6 @@ import ru.mycrg.http_client.handlers.BaseRequestHandler;
 
 import javax.transaction.Transactional;
 import java.util.List;
-import java.util.concurrent.atomic.AtomicInteger;
 import java.util.stream.Collectors;
 
 @SpringBootApplication
@@ -33,13 +32,16 @@ public class DatasetsApplication {
     private final Environment environment;
     private final ProjectHandler projectHandler;
     private final ProjectRepository projectRepository;
+    private final PermissionsHandler permissionsHandler;
 
     public DatasetsApplication(Environment environment,
+                               PermissionsHandler permissionsHandler,
                                ProjectRepository projectRepository,
                                ProjectHandler projectHandler) {
         this.environment = environment;
         this.projectHandler = projectHandler;
         this.projectRepository = projectRepository;
+        this.permissionsHandler = permissionsHandler;
     }
 
     public static void main(String[] args) {
@@ -51,30 +53,29 @@ public class DatasetsApplication {
     public void appReady() {
         initGeoserverClient();
 
-        final int orgId = 8;
+        final int orgId = Integer.parseInt(environment.getRequiredProperty("crg.orgId"));
+
         log.info("START HANDLE ORGANIZATION: {}", orgId);
 
         final List<Project> projects = projectRepository.findAll().stream()
-                .filter(project -> project.getOrganizationId() == orgId)
-                .collect(Collectors.toList());
+                                                        .filter(project -> project.getOrganizationId() == orgId)
+                                                        .collect(Collectors.toList());
 
-        AtomicInteger projectCount = new AtomicInteger(projects.size());
+        int projectCount = projects.size();
         log.info("There are {} projects", projectCount);
 
-        projects.forEach(project -> {
-//            if (project.getId() == 457) {
-                final Long projectId = project.getId();
-                log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
+        for (Project project: projects) {
+            final Long projectId = project.getId();
+            log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
 
-                projectHandler.handle(orgId, projectId);
+            permissionsHandler.handle(orgId, projectId);
 
-                projectCount.getAndDecrement();
-                log.info("DONE HANDLE PROJECT: {}", projectId);
-                log.info("****************************************************************************************************");
-                log.info("Left: {}", projectCount);
-//            }
-        log.info("****************************************************************************************************");
-        });
+            projectCount--;
+            log.info("DONE HANDLE PROJECT: {}", projectId);
+            log.info("**********************************************************************************************");
+            log.info("Left: {}", projectCount);
+            log.info("**********************************************************************************************");
+        }
     }
 
     private void initGeoserverClient() {

@@ -10,6 +10,7 @@ spring:
       hibernate.format_sql: true
 
 crg:
+  orgId: 11
   serverHost: 10.10.10.172
   db:
     port: 5434
