@@ -18,7 +18,7 @@ import javax.transaction.Transactional;
 import java.util.List;
 import java.util.UUID;
 
-import static ru.mycrg.datasets.DatasetsApplication.ORG_OWNER_ACCESS_KEY;
+import static ru.mycrg.datasets.DatasetsApplication.ROOT_ACCESS_KEY;
 import static ru.mycrg.datasets.DatasetsApplication.httpClient;
 import static ru.mycrg.geoserver_client.GeoserverClient.JSON_MEDIA_TYPE;
 
@@ -38,8 +38,8 @@ public class VectorLayerHandler {
     }
 
     public void handle(List<Layer> layers, long orgId, long projectId, String storageName) {
-        FeatureTypeService featureTypeService = new FeatureTypeService(ORG_OWNER_ACCESS_KEY);
-        StyleService styleService = new StyleService(ORG_OWNER_ACCESS_KEY);
+        FeatureTypeService featureTypeService = new FeatureTypeService(ROOT_ACCESS_KEY);
+        StyleService styleService = new StyleService(ROOT_ACCESS_KEY);
 
         layers.forEach(layer -> {
             if (isLayerAlreadyHandled(layer.getInternalName(), projectId)) {
@@ -104,11 +104,12 @@ public class VectorLayerHandler {
 
                     RequestBody payload = RequestBody.create(
                             JSON_MEDIA_TYPE,
-                            "{\"name\": \"" + storageName + "\",\"title\": \"" + layer.getTitle() + "\"}");
+                            "{\"name\": \"" + layer.getInternalName() + "\",\"title\": \"" + layer.getTitle() + "\"}");
 
+                    String ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjozMzQsInVzZXJfbmFtZSI6IktyYXNub2RhclByb2plY3RzQGVtYWlsLmNvbSIsInNjb3BlIjpbImNyZyJdLCJvcmdhbml6YXRpb25zIjpbeyJpZCI6OSwibmFtZSI6IktyYXNub2RhclByb2plY3RzIn1dLCJncm91cHMiOltdLCJleHAiOjE2MDY4MTA4MjIsImF1dGhvcml0aWVzIjpbIk9SR19BRE1JTiJdLCJqdGkiOiJiMTEwMGEyMC0yNTAyLTQyMmUtOTMxNi03OGRiNWZiOTE3MWMiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.Wx_5dbGnTJdxaFbPDP8YXIsQJzgic-f2pRkr4pgeWzQ";
                     Request request = new Request.Builder()
-                            .addHeader("Authorization", "Bearer " + ORG_OWNER_ACCESS_KEY)
-                            .url("http://localhost:8084/datasets/" + storageName + "/tables")
+                            .addHeader("Authorization", "Bearer " + ACCESS_KEY)
+                            .url("http://10.10.10.172:8100/api/data/datasets/workspace_408/tables")
                             .post(payload).build();
 
                     ResponseModel<Object> responseModel = httpClient.handleRequest(request);

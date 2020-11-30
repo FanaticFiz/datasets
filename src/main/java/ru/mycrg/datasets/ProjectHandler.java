@@ -14,7 +14,7 @@ import java.util.List;
 import java.util.UUID;
 import java.util.stream.Collectors;
 
-import static ru.mycrg.datasets.DatasetsApplication.ORG_OWNER_ACCESS_KEY;
+import static ru.mycrg.datasets.DatasetsApplication.ROOT_ACCESS_KEY;
 
 @Service
 public class ProjectHandler {
@@ -59,7 +59,7 @@ public class ProjectHandler {
     }
 
     private String createVectorStorage(int orgId, Long projectId) {
-        VectorStorage vectorStorage = new VectorStorage(ORG_OWNER_ACCESS_KEY);
+        VectorStorage vectorStorage = new VectorStorage(ROOT_ACCESS_KEY);
         try {
             final String databaseName = "database_" + orgId;
             final String schemaName = "workspace_" + projectId;

@@ -26,7 +26,7 @@ public class DatasetsApplication {
 
     public static final Logger log = LoggerFactory.getLogger(DatasetsApplication.class);
 
-    public static final String ORG_OWNER_ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDY2NDc2ODgsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiI5MjExNDE4Zi0xZDBmLTRiZTgtOTIyNC05ZTM2ZGQ0ODk4MTQiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.wHnQzeenExEiNr-EMvCYK8lSZB60SuC5wIeS4rLgIS8";
+    public static final String ROOT_ACCESS_KEY = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VyX2lkIjoxLCJ1c2VyX25hbWUiOiJhZG1pbkBtYWlsLnJ1Iiwic2NvcGUiOlsiY3JnIl0sIm9yZ2FuaXphdGlvbnMiOltdLCJncm91cHMiOltdLCJleHAiOjE2MDY4MTAwNTUsImF1dGhvcml0aWVzIjpbIkdMT0JBTF9BRE1JTiJdLCJqdGkiOiIyOGY5N2M3OS01NmI2LTRkY2QtYTFhYS0yYTdlYjQ4ZmEyZTUiLCJjbGllbnRfaWQiOiJhZG1pbiJ9.lSQtUgUaaXUx6QglXIT7Q5T4ZXNC_0pGUwmGEAf0V74";
 
     public static HttpClient httpClient;
 
@@ -51,29 +51,27 @@ public class DatasetsApplication {
     public void appReady() {
         initGeoserverClient();
 
-        final int orgId = 8;
+        final int orgId = 9;
         log.info("START HANDLE ORGANIZATION: {}", orgId);
 
         final List<Project> projects = projectRepository.findAll().stream()
-                .filter(project -> project.getOrganizationId() == orgId)
-                .collect(Collectors.toList());
+                                                        .filter(project -> project.getOrganizationId() == orgId)
+                                                        .collect(Collectors.toList());
 
         AtomicInteger projectCount = new AtomicInteger(projects.size());
         log.info("There are {} projects", projectCount);
 
         projects.forEach(project -> {
-//            if (project.getId() == 457) {
-                final Long projectId = project.getId();
-                log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
+            final Long projectId = project.getId();
+            log.info("HANDLE Project: {} {} / {}", projectId, project.getInternalName(), project.getName());
 
-                projectHandler.handle(orgId, projectId);
+            projectHandler.handle(orgId, projectId);
 
-                projectCount.getAndDecrement();
-                log.info("DONE HANDLE PROJECT: {}", projectId);
-                log.info("****************************************************************************************************");
-                log.info("Left: {}", projectCount);
-//            }
-        log.info("****************************************************************************************************");
+            projectCount.getAndDecrement();
+            log.info("DONE HANDLE PROJECT: {}", projectId);
+            log.info("***********************************************************************************************");
+            log.info("Left: {}", projectCount);
+            log.info("***********************************************************************************************");
         });
     }
 

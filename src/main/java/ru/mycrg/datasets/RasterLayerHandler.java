@@ -14,7 +14,7 @@ import ru.mycrg.http_client.exceptions.HttpClientException;
 
 import java.util.List;
 
-import static ru.mycrg.datasets.DatasetsApplication.ORG_OWNER_ACCESS_KEY;
+import static ru.mycrg.datasets.DatasetsApplication.ROOT_ACCESS_KEY;
 
 @Service
 public class RasterLayerHandler {
@@ -49,7 +49,7 @@ public class RasterLayerHandler {
 
     private String getCoverageStoreFileUrl(long projectId, String storeName) {
         try {
-            RasterStorage rasterStorage = new RasterStorage(ORG_OWNER_ACCESS_KEY);
+            RasterStorage rasterStorage = new RasterStorage(ROOT_ACCESS_KEY);
 
             final var responseModel = rasterStorage.getStorage("workspace_" + projectId, storeName);
             if (!responseModel.isSuccessful()) {
@@ -64,7 +64,7 @@ public class RasterLayerHandler {
 
     private String createRasterStore(String workspace, String oldStoreName, String fileUrl) {
         try {
-            RasterStorage rasterStorage = new RasterStorage(ORG_OWNER_ACCESS_KEY);
+            RasterStorage rasterStorage = new RasterStorage(ROOT_ACCESS_KEY);
 
             final ResponseModel<Object> responseModel = rasterStorage.createGeoTIFF(workspace, oldStoreName, fileUrl);
             if (!responseModel.isSuccessful()) {
@@ -81,7 +81,7 @@ public class RasterLayerHandler {
         try {
             log.info("Try create coverage on: {}", storeName);
 
-            Coverages coverages = new Coverages(ORG_OWNER_ACCESS_KEY);
+            Coverages coverages = new Coverages(ROOT_ACCESS_KEY);
 
             final String crs = String.valueOf(extractCRSNumber(layer.getNativeCRS()));
             final String name = layer.getInternalName();
