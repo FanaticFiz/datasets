@@ -47,7 +47,7 @@ public class DatasetsApplication {
                 .collect(Collectors.toList());
         log.info("Found organizations: {}", allExistOrganizationIds);
 
-        allExistOrganizationIds.forEach(orgId -> dataHandler.handleDatabase(orgId));
+        allExistOrganizationIds.forEach(dataHandler::handleDatabase);
 
         System.exit(0);
     }

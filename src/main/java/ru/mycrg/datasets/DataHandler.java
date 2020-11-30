@@ -52,17 +52,17 @@ public class DataHandler {
 
         datasets.add(new ResourceDescription(project.getName(), "SCHEMA", project.getInternalName(), layers.size()));
 
-        layers.forEach(layer -> {
-            final ResourceDescription rdTable = new ResourceDescription(
-                    layer.getTitle(),
-                    "TABLE",
-                    project.getInternalName() + "." + layer.getInternalName(),
-                    0);
-
-            datasets.add(rdTable);
-        });
-
-        log.info("    Layers: {}", datasets.size() - 1);
+//        layers.forEach(layer -> {
+//            final ResourceDescription rdTable = new ResourceDescription(
+//                    layer.getTitle(),
+//                    "TABLE",
+//                    project.getInternalName() + "." + layer.getInternalName(),
+//                    0);
+//
+//            datasets.add(rdTable);
+//        });
+//
+//        log.info("    Layers: {}", datasets.size() - 1);
 
         datasetRepository.writeDatasets(datasets);
     }
